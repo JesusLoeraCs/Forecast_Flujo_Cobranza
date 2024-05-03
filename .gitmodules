@@ -1,0 +1,3 @@
+[submodule "NN_Flujo_Cobranza"]
+	path = NN_Flujo_Cobranza
+	url = https://github.com/JesusLoeraCs/NN_Flujo_Cobranza.git
