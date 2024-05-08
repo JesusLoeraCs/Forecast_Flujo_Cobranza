@@ -15,8 +15,7 @@ LOWER_DATE = {'year': '2023', 'month': '01', 'day': '01'}
 UPPER_DATE = {'year': '2024', 'month': '06', 'day': '30'}
 
 FLUX_DB_NAME = 'forecast_flujo_cobranza'
-FLUX_COLLECTION_NAME = 'model01_mensual'
-
+MODEL_NAME = 'model01'
 
 def monthly_flux_model01():
     """Predict the monthly flux with model01 and load it into MongoDB."""
@@ -45,7 +44,8 @@ def monthly_flux_model01():
     model.eval()
 
     print("\nCleaning data and making predictions...")
-    flux = predict(
+
+    monthly_flux, amort_flux = predict(
         raw_data=raw_data,
         model=model,
         log=log,
@@ -54,12 +54,22 @@ def monthly_flux_model01():
         date_max=UPPER_DATE
     )
 
-    print("\nLoading predictions to MongoDB...")
+    print("\nLoading monthly predictions to MongoDB...")
+
     load_to_mongo(
-        flux,
+        monthly_flux,
         uri=URI,
         db_name=FLUX_DB_NAME,
-        collection_name=FLUX_COLLECTION_NAME
+        collection_name=f'{MODEL_NAME}_mensual'
+    )
+
+    print("\nLoading granular predictions to MongoDB...")
+
+    load_to_mongo(
+        amort_flux,
+        uri=URI,
+        db_name=FLUX_DB_NAME,
+        collection_name=f'{MODEL_NAME}_amortizacion'
     )
 
     print("Process finished.\n")
