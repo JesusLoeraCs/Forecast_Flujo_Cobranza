@@ -28,7 +28,7 @@ def clean_dataset(
     # Convert dtypes
     data['fecha'] = pd.to_datetime(data['fecha'])
     data['fecha_pagada'] = pd.to_datetime(data['fecha_pagada'])
-    data = data.astype({'empresa_id': float, 'monto_pago': float})
+    data = data.astype({'empresa_id': float, 'monto_pago': float, 'credito_4m100': bool})
 
     # Make predictions in data after 2023
     x_min = pd.to_datetime("2023-01-01 00:00:00+00:00")
@@ -75,7 +75,7 @@ def impute_data(data: pd.DataFrame) -> pd.DataFrame:
     data.fillna({'media_dae': 0.0, 'std_dae': 0.0, 'moda_dae': 0.0}, inplace=True)
 
     # Replace NaN en credito_4m100 with False.
-    data = data.fillna({'credito_4m100': False})
+    data.fillna({'credito_4m100': False})
 
     # Possible missing empresa_id to new company
     min_value = data['empresa_id'].min()
