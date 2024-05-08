@@ -62,9 +62,17 @@ def predict(raw_data, model, log, time_delta, date_min, date_max):
     data['año_pag'] = data['fecha_pagada'].dt.year
 
     if time_delta == 'monthly':
-        flux_df = monthly_flux(data, date_min, date_max)
 
-    return flux_df
+        agg_flux = monthly_flux(data, date_min, date_max)
+
+        cols_amort_flux = [
+            'id', 'empresa_id', 'monto_pago', 'pagada', 'fecha_pagada', 'fecha',
+            'fecha_pred'
+        ]
+
+        amort_flux = data[cols_amort_flux]
+
+    return agg_flux, amort_flux
 
 
 def transform_predictions(predictions, scalers):
