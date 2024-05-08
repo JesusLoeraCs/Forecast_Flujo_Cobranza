@@ -22,14 +22,10 @@ def read_json_as_dict(json_path):
     return dictionary
 
 
-def clean_for_mongo(df: pd.DataFrame, cols_decimales) -> pd.DataFrame:
+def clean_for_mongo(df: pd.DataFrame) -> pd.DataFrame:
     """Preparar el dataframe para subirse a MongoDB"""
 
     df = df.copy()
-
-    # Convertir los Decimals a float en el DataFrame
-    for col in cols_decimales:
-        df = df.astype({col: float})
 
     # Convertir fechas al formato formato de fecha y hora ISO 8601
     for col in df.columns:
@@ -53,8 +49,7 @@ def load_to_mongo(
     
     """
 
-    columnas_decimales = ['nn', 'dev', 'real']
-    dataset_mongo = clean_for_mongo(data, columnas_decimales)
+    dataset_mongo = clean_for_mongo(data)
 
     # Establecer conexión con MongoDB
     client = MongoClient(uri)
