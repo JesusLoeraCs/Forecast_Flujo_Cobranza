@@ -16,6 +16,7 @@ def dataset_from_mongo(
         database_name: str,
         collection_name: str,
         uri: str = "mongodb://localhost:27017/",
+        batch_size = 1000, 
         show_progress_bar: bool = True
     ) -> pd.DataFrame:
     """Establish a connection to MongoDB to query data collections.
@@ -39,12 +40,15 @@ def dataset_from_mongo(
     cursor = collection.find()
 
     # Load data into DataFrame with progress bar
+    projection = {"_id": 0}
+    cursor = collection.find(projection=projection, batch_size=batch_size)
+
     if show_progress_bar:
-        df = pd.DataFrame(tqdm(cursor, desc="Loading data"))
+        df = pd.DataFrame(tqdm(cursor, desc="Reading data..."))
     else:
         df = pd.DataFrame(cursor)
 
-    df = df[[x for x in df.columns if x != '_id']]
+    client.close()
 
     return df
 
