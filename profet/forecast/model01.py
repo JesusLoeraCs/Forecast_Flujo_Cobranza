@@ -7,7 +7,7 @@ from profet.forecast.flux import predict
 from NN_Flujo_Cobranza.neuralnet.nets.model01 import Net01
 
 
-DATASET_DB_NAME = 'datasets_flujo_cobranza'
+DATASET_DB_NAME = 'dataset_flujo_cobranza'
 DATASET_COLLECTION_NAME = 'v1'
 
 URI = "mongodb://localhost:27017/"
