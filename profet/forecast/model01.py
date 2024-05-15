@@ -58,8 +58,8 @@ def monthly_flux_model01():
 
     load_to_mongo(
         monthly_flux,
-        uri=URI,
-        db_name=FLUX_DB_NAME,
+        mongo_uri=URI,
+        database_name=FLUX_DB_NAME,
         collection_name=f'{MODEL_NAME}_mensual'
     )
 
@@ -67,8 +67,8 @@ def monthly_flux_model01():
 
     load_to_mongo(
         amort_flux,
-        uri=URI,
-        db_name=FLUX_DB_NAME,
+        mongo_uri=URI,
+        database_name=FLUX_DB_NAME,
         collection_name=f'{MODEL_NAME}_amortizacion'
     )
 

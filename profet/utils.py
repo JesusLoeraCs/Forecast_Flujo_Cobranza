@@ -38,8 +38,10 @@ def clean_for_mongo(df: pd.DataFrame) -> pd.DataFrame:
 
 def load_to_mongo(
         data: pd.DataFrame,
-        uri: str, db_name: str,
-        collection_name: str
+        mongo_uri: str,
+        database_name: str,
+        collection_name: str,
+        batch_size: int = 2000
     ) -> None:
     """Guardar dataset.
     
@@ -52,14 +54,22 @@ def load_to_mongo(
     dataset_mongo = clean_for_mongo(data)
 
     # Establecer conexión con MongoDB
-    client = MongoClient(uri)
-    db = client[db_name]
-    collection = db[collection_name]
-    collection.delete_many({})
+    client = MongoClient(mongo_uri)
 
-    # Convertir el DataFrame a formato JSON y cargarlo en la colección
-    records = dataset_mongo.to_dict(orient='records')
-    collection.insert_many(records)
+    # Acceder a la base de datos
+    db = client[database_name]
+
+    # Acceder a la colección (o crearla si no existe)
+    collection = db[collection_name]
+
+    # Eliminar todos los documentos existentes en la colección
+    collection.delete_many({})  # Elimina todos los documentos
+
+    # Cargar el DataFrame en lotes
+    for i in range(0, len(dataset_mongo), batch_size):
+        batch = dataset_mongo.iloc[i:i+batch_size]
+        records = batch.to_dict(orient='records')
+        collection.insert_many(records)
 
     # Cerrar la conexión
     client.close()
