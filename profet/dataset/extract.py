@@ -16,7 +16,7 @@ def dataset_from_mongo(
         database_name: str,
         collection_name: str,
         uri: str = "mongodb://localhost:27017/",
-        batch_size = 1000, 
+        batch_size = 10000, 
         show_progress_bar: bool = True
     ) -> pd.DataFrame:
     """Establish a connection to MongoDB to query data collections.
@@ -37,20 +37,30 @@ def dataset_from_mongo(
     client = MongoClient(uri)
     db = client[database_name]
     collection = db[collection_name]
-    cursor = collection.find()
+    cursor = collection.find(projection={"_id": 0}, batch_size=batch_size)
 
-    # Load data into DataFrame with progress bar
-    projection = {"_id": 0}
-    cursor = collection.find(projection=projection, batch_size=batch_size)
-
+    df = pd.DataFrame()
     if show_progress_bar:
-        df = pd.DataFrame(tqdm(cursor, desc="Reading data..."))
+        for batch in tqdm(batched(cursor, batch_size), desc="Loading data..."):
+            df = pd.concat([df, pd.DataFrame(batch)], ignore_index=True)
     else:
-        df = pd.DataFrame(cursor)
+        for batch in batched(cursor, batch_size):
+            df = pd.concat([df, pd.DataFrame(batch)], ignore_index=True)
 
     client.close()
-
     return df
+
+
+def batched(cursor, batch_size):
+    batch = []
+    for doc in cursor:
+        batch.append(doc)
+        if batch and not len(batch) % batch_size:
+            yield batch
+            batch = []
+
+    if batch:   # last documents
+        yield batch
 
 
 def github_read_parquet(
